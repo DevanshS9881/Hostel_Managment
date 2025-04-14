@@ -13,7 +13,8 @@
       <li><a href="#" onclick="showStudents()">Students</a></li>
       <li><a href="#" onclick="showCheckInOut()">Check-In/Out</a></li>
 
-      <li><a href="#">Payments</a></li>
+      <li><a href="#" onclick="showPayments()">Payments</a></li>
+
       <li><a href="#">Profile</a></li>
     </ul>
   </nav>
@@ -125,6 +126,87 @@
       html += `</tbody></table>`;
       document.getElementById("output").innerHTML = html;
     }
+    async function showPayments() {
+    const res = await fetch(baseUrl + "/getStudents");
+    const students = await res.json();
+
+    let html = `
+      <h2>Student Payments</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Roll Number</th>
+            <th>Room</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    students.forEach(s => {
+      const roomNumber = s.Room?.RoomNumber || "Not Assigned";
+      html += `
+        <tr>
+          <td>${s.Name}</td>
+          <td>${s.RollNumber}</td>
+          <td>${roomNumber}</td>
+          <td><button onclick="loadStudentPayments(${s.ID}, '${s.Name}')">View Payment History</button></td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>
+      <div id="paymentDetails" style="margin-top: 20px;"></div>
+    `;
+
+    document.getElementById("output").innerHTML = html;
+  }
+
+  async function loadStudentPayments(studentId, studentName) {
+    try {
+      const res = await fetch(`${baseUrl}/payments?student_id=${studentId}`);
+      const data = await res.json();
+      const payments = data.payments || [];
+
+      let html = `<h3>Payment History for ${studentName}</h3>`;
+
+      if (payments.length === 0) {
+        html += "<p>No payments found for this student.</p>";
+      } else {
+        html += `
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Transaction ID</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        payments.forEach(p => {
+          html += `
+            <tr>
+              <td>₹${p.Amount}</td>
+              <td>${p.Description}</td>
+              <td>${new Date(p.PaidAt).toLocaleString()}</td>
+              <td>${p.TransactionID}</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table>`;
+      }
+
+      document.getElementById("paymentDetails").innerHTML = html;
+    } catch (err) {
+      console.error("Error loading payments:", err);
+      document.getElementById("paymentDetails").innerHTML = "<p>❌ Failed to load payments</p>";
+    }
+  }
 
   </script>
 </body>
