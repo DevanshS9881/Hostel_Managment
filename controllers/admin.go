@@ -53,3 +53,47 @@ func GetAllRooms(c *fiber.Ctx) error {
     return c.JSON(result)
 }
 
+
+func GetAllCheckInOutRecords(c *fiber.Ctx) error {
+	var records []models.CheckInOut
+	if err := database.DB.Preload("Student").Find(&records).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch records"})
+	}
+
+	var response []fiber.Map
+	for _, r := range records {
+		checkOutStr := "Not checked out"
+		if r.CheckOut != nil {
+			checkOutStr = r.CheckOut.Format("2006-01-02 15:04:05")
+		}
+
+		response = append(response, fiber.Map{
+			"student_name": r.Student.Name,
+			"roll_number":  r.Student.RollNumber,
+			"check_in":     r.CheckIn.Format("2006-01-02 15:04:05"),
+			"check_out":    checkOutStr,
+		})
+	}
+
+	return c.JSON(response)
+}
+func GetPayments(c *fiber.Ctx) error {
+	studentID := c.Query("student_id") // Optional filter
+
+	var payments []models.Payment
+	query := database.DB
+
+	if studentID != "" {
+		query = query.Where("student_id = ?", studentID)
+	}
+
+	if err := query.Order("paid_at desc").Find(&payments).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to retrieve payments"})
+	}
+
+	return c.JSON(fiber.Map{
+		"payments": payments,
+	})
+}
+
+

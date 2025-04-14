@@ -37,6 +37,7 @@ type Payment struct {
     Student    Student   `gorm:"foreignKey:StudentID"`
     Amount     float64   `gorm:"not null"`
     PaidAt     time.Time `gorm:"autoCreateTime"`
+    TransactionID string `gorm:"type:varchar(100);uniqueIndex"`
     Description string
 }
 

@@ -11,7 +11,8 @@
     <ul class="nav-links">
       <li><a href="#" onclick="showRooms()">Rooms</a></li>
       <li><a href="#" onclick="showStudents()">Students</a></li>
-      <li><a href="#">Check-In/Out</a></li>
+      <li><a href="#" onclick="showCheckInOut()">Check-In/Out</a></li>
+
       <li><a href="#">Payments</a></li>
       <li><a href="#">Profile</a></li>
     </ul>
@@ -92,6 +93,39 @@
       html += `</tbody></table>`;
       document.getElementById("output").innerHTML = html;
     }
+    async function showCheckInOut() {
+      const res = await fetch(baseUrl + "/checkinoutRecords");
+      const data = await res.json();
+
+      let html = `
+        <h2>Check-In / Check-Out Logs</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Roll Number</th>
+              <th>Check-In Time</th>
+              <th>Check-Out Time</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(log => {
+        html += `
+          <tr>
+            <td>${log.student_name}</td>
+            <td>${log.roll_number}</td>
+            <td>${log.check_in}</td>
+            <td>${log.check_out}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById("output").innerHTML = html;
+    }
+
   </script>
 </body>
 </html>

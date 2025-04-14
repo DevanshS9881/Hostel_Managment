@@ -4,7 +4,7 @@ import (
 	"hostel/database"
 	"hostel/models"
 	"time"
-
+    "fmt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -114,4 +114,44 @@ func CheckOutStudent(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(record)
+}
+
+func CreatePayment(c *fiber.Ctx) error {
+	type PaymentInput struct {
+		StudentID   uint    `json:"student_id"`
+		Amount      float64 `json:"amount"`
+		Description string  `json:"description"`
+	}
+
+	var input PaymentInput
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	// Check if student exists
+	var student models.Student
+	if err := database.DB.First(&student, input.StudentID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Student not found"})
+	}
+
+	transactionID := fmt.Sprintf("TXN-%d-%d", input.StudentID, time.Now().UnixNano())
+
+	payment := models.Payment{
+		StudentID:     input.StudentID,
+		Amount:        input.Amount,
+		Description:   input.Description,
+		TransactionID: transactionID,
+		PaidAt:        time.Now(),
+	}
+
+	if err := database.DB.Create(&payment).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create payment"})
+	}
+
+	return c.JSON(fiber.Map{
+		"message":        "Payment successful",
+		"transaction_id": transactionID,
+		"paid_at":        payment.PaidAt,
+	})
+    
 }

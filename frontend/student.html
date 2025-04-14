@@ -29,7 +29,22 @@
     </div>
 
     <div id="profileSection" class="card"></div>
-    <div id="paymentSection" class="card" style="display:none">💰 Payment portal coming soon...</div>
+    <div id="paymentSection" class="card" style="display:none">
+      <h2>💳 Make a Payment</h2>
+      <label>Amount: ₹</label>
+      <input type="number" id="amountInput" min="1" step="0.01" required />
+      <br><br>
+      <label>Description (optional):</label>
+      <input type="text" id="descInput" placeholder="e.g. Hostel fee, Laundry, etc." />
+      <br><br>
+      <button onclick="makePayment()">💰 Pay Now</button>
+    
+      <h3>🧾 Recent Transactions</h3>
+      <ul id="paymentLogs">
+        <li>Loading payment history...</li>
+      </ul>
+    </div>
+    
     <div id="checkSection" class="card" style="display:none">
       <h2>🕒 Check-In / Check-Out</h2>
     
@@ -161,6 +176,66 @@ window.addEventListener("DOMContentLoaded", () => {
       loadCheckLogs();
     }
   });
+
+  async function makePayment() {
+    const amount = parseFloat(document.getElementById("amountInput").value);
+    const desc = document.getElementById("descInput").value;
+
+    if (!amount || amount <= 0) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    const res = await fetch("http://localhost:3000/makePayment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student_id: parseInt(studentId),
+        amount: amount,
+        description: desc
+      })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(`✅ Payment successful! Transaction ID: ${data.transaction_id}`);
+      document.getElementById("amountInput").value = "";
+      document.getElementById("descInput").value = "";
+      loadPayments();
+    } else {
+      alert("❌ Payment failed: " + data.error);
+    }
+  }
+
+  async function loadPayments() {
+  try {
+    const res = await fetch(`http://localhost:3000/payments?student_id=${studentId}`);
+    const data = await res.json();
+    const payments = data.payments || [];
+
+    const list = document.getElementById("paymentLogs");
+    list.innerHTML = "";
+
+    if (payments.length === 0) {
+      list.innerHTML = "<li>No payments made yet.</li>";
+      return;
+    }
+
+    payments.forEach(p => {
+      list.innerHTML += `
+        <li>₹${p.amount} | ${new Date(p.paid_at).toLocaleString()} | TXN: ${p.transaction_id}</li>
+      `;
+    });
+  } catch (err) {
+    console.error("Failed to load payments:", err);
+    document.getElementById("paymentLogs").innerHTML = "<li>❌ Error loading payment history</li>";
+  }
+}
+
+
+  // Load payments when switching to payment tab
+  document.querySelector("button[onclick=\"showSection('paymentSection')\"]").addEventListener("click", loadPayments);
 
     //fetchStudent();
   </script>
