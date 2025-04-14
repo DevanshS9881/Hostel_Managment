@@ -16,6 +16,7 @@ func SetRoutes(app *fiber.App){
     app.Post("/checkout", controllers.CheckOutStudent)
 	app.Get("/checkinoutRecords", controllers.GetAllCheckInOutRecords)
 	app.Post("/makePayment", controllers.CreatePayment)
+	app.Get("/payments", controllers.GetPayments)
 
 
 }

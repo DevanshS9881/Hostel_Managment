@@ -223,10 +223,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     payments.forEach(p => {
-      list.innerHTML += `
-        <li>₹${p.amount} | ${new Date(p.paid_at).toLocaleString()} | TXN: ${p.transaction_id}</li>
-      `;
-    });
+  list.innerHTML += `
+    <li>₹${p.Amount} | ${new Date(p.PaidAt).toLocaleString()} | TXN: ${p.TransactionID}</li>
+  `;
+});
+
   } catch (err) {
     console.error("Failed to load payments:", err);
     document.getElementById("paymentLogs").innerHTML = "<li>❌ Error loading payment history</li>";
