@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hostel Registration - Hall 14</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏠 Hostel Registration for Hall -14, NIT Durgapur</h1>
+    </header>
+
+    <div class="card">
+      <h2>Login</h2>
+      <select id="role">
+        <option value="student">Student</option>
+        <option value="admin">Admin</option>
+      </select>
+      <input type="text" id="emailOrUsername" placeholder="Email / Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div class="card">
+      <h2>Or Sign Up (Students Only)</h2>
+      <input type="text" id="signupName" placeholder="Full Name" />
+      <input type="email" id="signupEmail" placeholder="Email" />
+      <input type="text" id="signupRoll" placeholder="Roll Number" />
+      <input type="text" id="signupPhone" placeholder="Phone" />
+      <input type="password" id="signupPassword" placeholder="Password" />
+      <button onclick="signup()">Sign Up</button>
+    </div>
+
+    <footer>
+      <p>© 2025 Hostel Management System | Hall 14 | NIT Durgapur</p>
+    </footer>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+package routes
+
+import (
+	"hostel/controllers"
+	"github.com/gofiber/fiber/v2"
+)
+
+func SetRoutes(app *fiber.App){
+	app.Post("/register_s",controllers.StudentSignIn)
+	app.Post("/login_a",controllers.AdminLogin)
+	app.Post("/login_s",controllers.StudentLogin)
+	app.Get("/getStudents",controllers.GetAllStudents)
+	app.Get("/getRooms",controllers.GetAllRooms)
+	app.Get("/getStudent/:id", controllers.GetStudentByID)
+
+ }

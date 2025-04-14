@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <h1>Admin Dashboard - Hall 14</h1>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showRooms()">Rooms</a></li>
+      <li><a href="#" onclick="showStudents()">Students</a></li>
+      <li><a href="#">Check-In/Out</a></li>
+      <li><a href="#">Payments</a></li>
+      <li><a href="#">Profile</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div id="output">
+      <p>Select an option from the navbar to view data.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Hall 14 Hostel Management System | NIT Durgapur</p>
+  </footer>
+
+  <script>
+    const baseUrl = "http://localhost:3000";
+
+    async function showRooms() {
+      const res = await fetch(baseUrl + "/getRooms");
+      const data = await res.json();
+
+      let html = `
+        <h2>All Rooms</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Room Number</th>
+              <th>Occupied / Max Beds</th>
+              <th>Students</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(room => {
+        html += `
+          <tr>
+            <td>${room.room_number}</td>
+            <td>${room.occupied_beds} / ${room.max_beds}</td>
+            <td>${room.students.join(', ')}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById("output").innerHTML = html;
+    }
+
+    async function showStudents() {
+      const res = await fetch(baseUrl + "/getStudents");
+      const data = await res.json();
+
+      let html = `
+        <h2>All Students</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Roll Number</th>
+              <th>Room</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(s => {
+        const roomNumber = s.Room?.RoomNumber || "Not Assigned";
+        html += `
+          <tr>
+            <td>${s.Name}</td>
+            <td>${s.RollNumber}</td>
+            <td>${roomNumber}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById("output").innerHTML = html;
+    }
+  </script>
+</body>
+</html>

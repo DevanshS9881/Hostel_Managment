@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .nav {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+    .nav button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎓 Welcome to Student Dashboard</h1>
+
+    <div class="nav">
+      <button onclick="showSection('profileSection')">Profile</button>
+      <button onclick="showSection('paymentSection')">Make Payment</button>
+      <button onclick="showSection('checkSection')">Check-In/Out</button>
+    </div>
+
+    <div id="profileSection" class="card"></div>
+    <div id="paymentSection" class="card" style="display:none">💰 Payment portal coming soon...</div>
+    <div id="checkSection" class="card" style="display:none">🕒 Check-in/out section coming soon...</div>
+  </div>
+
+  <script>
+   let studentId;
+
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  studentId = urlParams.get('id');
+  console.log("Extracted studentId:", studentId);
+
+  if (studentId) {
+    fetchStudent(); // call it *after* studentId is set
+  } else {
+    alert("Student ID not found in URL.");
+  }
+});
+    function showSection(sectionId) {
+      ['profileSection', 'paymentSection', 'checkSection'].forEach(id => {
+        document.getElementById(id).style.display = id === sectionId ? 'block' : 'none';
+      });
+    }
+
+    async function fetchStudent() {
+      const res = await fetch(`http://localhost:3000/getStudent/${studentId}`);
+      const data = await res.json();
+      console.log("Full response from backend:", data);
+      const s = data.student;
+      const room = s.Room;
+
+      document.getElementById("profileSection").innerHTML = `
+        <h2>👤 Student Profile</h2>
+        <p><strong>Name:</strong> ${s.Name}</p>
+        <p><strong>Roll Number:</strong> ${s.RollNumber}</p>
+        <p><strong>Email:</strong> ${s.Email}</p>
+        <p><strong>Phone:</strong> ${s.Phone}</p>
+        <h3>🏠 Room Details</h3>
+        <p><strong>Room Number:</strong> ${room.RoomNumber}</p>
+        <p><strong>Capacity:</strong> ${room.Capacity}</p>
+        <p><strong>Occupied:</strong> ${room.Occupied}</p>
+      `;
+    }
+
+    //fetchStudent();
+  </script>
+</body>
+</html>
