@@ -12,5 +12,7 @@ func SetRoutes(app *fiber.App){
 	app.Get("/getStudents",controllers.GetAllStudents)
 	app.Get("/getRooms",controllers.GetAllRooms)
 	app.Get("/getStudent/:id", controllers.GetStudentByID)
+	app.Post("/checkin", controllers.CheckInStudent)
+    app.Post("/checkout", controllers.CheckOutStudent)
 
  }

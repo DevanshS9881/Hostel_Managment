@@ -30,7 +30,20 @@
 
     <div id="profileSection" class="card"></div>
     <div id="paymentSection" class="card" style="display:none">💰 Payment portal coming soon...</div>
-    <div id="checkSection" class="card" style="display:none">🕒 Check-in/out section coming soon...</div>
+    <div id="checkSection" class="card" style="display:none">
+      <h2>🕒 Check-In / Check-Out</h2>
+    
+      <div style="margin-bottom: 10px;">
+        <button onclick="handleCheckIn()">✅ Check In</button>
+        <button onclick="handleCheckOut()">⬅️ Check Out</button>
+      </div>
+    
+      <h3>📜 Check-In/Out History</h3>
+      <ul id="logList">
+        <li>Loading logs...</li>
+      </ul>
+    </div>
+    
   </div>
 
   <script>
@@ -72,6 +85,82 @@ window.addEventListener("DOMContentLoaded", () => {
         <p><strong>Occupied:</strong> ${room.Occupied}</p>
       `;
     }
+    async function handleCheckIn() {
+    try {
+      const res = await fetch("http://localhost:3000/checkin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: parseInt(studentId) })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Checked in successfully at " + new Date(data.CheckIn).toLocaleString());
+        loadCheckLogs();
+      } else {
+        alert("❌ Check-in failed: " + data.error);
+      }
+    } catch (error) {
+      console.error("Check-in error:", error);
+      alert("❌ Error during check-in");
+    }
+  }
+
+  async function handleCheckOut() {
+    try {
+      const res = await fetch("http://localhost:3000/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: parseInt(studentId) })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("⬅️ Checked out successfully at " + new Date(data.CheckOut).toLocaleString());
+        loadCheckLogs();
+      } else {
+        alert("❌ Check-out failed: " + data.error);
+      }
+    } catch (error) {
+      console.error("Check-out error:", error);
+      alert("❌ Error during check-out");
+    }
+  }
+
+  async function loadCheckLogs() {
+    try {
+      const res = await fetch(`http://localhost:3000/getStudent/${studentId}`);
+      const data = await res.json();
+
+      const logs = data.check_in_out_logs || [];
+      const logList = document.getElementById("logList");
+      logList.innerHTML = "";
+
+      if (logs.length === 0) {
+        logList.innerHTML = "<li>No check-in/out records found.</li>";
+        return;
+      }
+
+      logs.forEach(log => {
+        logList.innerHTML += `<li>🟢 In: ${log.check_in} | 🔴 Out: ${log.check_out ?? "—"}</li>`;
+      });
+    } catch (error) {
+      console.error("Error loading logs:", error);
+      document.getElementById("logList").innerHTML = "<li>❌ Failed to load logs</li>";
+    }
+  }
+
+  // Automatically load logs once student ID is ready
+  window.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    studentId = urlParams.get('id');
+    if (studentId) {
+      fetchStudent();
+      loadCheckLogs();
+    }
+  });
 
     //fetchStudent();
   </script>

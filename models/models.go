@@ -42,9 +42,9 @@ type Payment struct {
 
 // CheckInOut table
 type CheckInOut struct {
-    ID         uint      `gorm:"primaryKey"`
-    StudentID  uint      `gorm:"not null"`
-    Student    Student   `gorm:"foreignKey:StudentID"`
-    CheckIn    time.Time
-    CheckOut   time.Time
+    ID         uint       `gorm:"primaryKey"`
+    StudentID  uint       `gorm:"not null"`
+    Student    Student    `gorm:"foreignKey:StudentID"`
+    CheckIn    time.Time  `gorm:"not null"`
+    CheckOut   *time.Time // Nullable
 }
